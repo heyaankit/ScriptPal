@@ -42,6 +42,7 @@ env/
 *.db
 *.sqlite
 *.sqlite3
+!data/app.db
 
 # Testing
 .pytest_cache/
@@ -61,8 +62,9 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Sisyphus (AI orchestration)
-.sisyphus/
+# Local config
+.*
+!.gitignore
 
 # Ruff (linter cache)
 .ruff_cache/
