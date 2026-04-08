@@ -1,149 +1,110 @@
-# FastAPI Authentication Tutorial
+# OTP-Based Authentication System
 
-A beginner-friendly tutorial on implementing authentication and authorization in FastAPI with PostgreSQL.
+A FastAPI-based OTP authentication system for mobile-first applications.
 
 ## Features
 
-- User registration with Argon2 password hashing
-- JWT token-based login
-- Protected routes with authentication
-- Role-based access control (user/admin)
-- Async SQLAlchemy with PostgreSQL
+- User registration with phone number
+- OTP generation and verification (6 digits, 5 min expiry)
+- Login via phone + OTP (no password)
+- JWT token-based authentication
+- Protected routes
+- Health check endpoint
 
-## Quick Start
+## Tech Stack
 
-### Prerequisites
+- **FastAPI** - Web framework
+- **SQLAlchemy** - ORM
+- **SQLite** - Database
+- **python-jose** - JWT tokens
+- **pydantic** - Data validation
 
-- Python 3.9+
-- PostgreSQL (running on localhost:5432)
-- pip or poetry
+## Setup
 
-### Installation
-
+1. **Create virtual environment:**
 ```bash
-pip install -r requirements.txt
+python -m venv otp_venv
+source otp_venv/bin/activate
 ```
 
-Create `.env` file:
-```env
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/fastapi_auth
-SECRET_KEY=your-secret-key-change-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-DEBUG=true
+2. **Install dependencies:**
+```bash
+pip install fastapi uvicorn[standard] sqlalchemy python-jose pydantic pydantic-settings
 ```
 
-### Run the Server
-
+3. **Run the server:**
 ```bash
 uvicorn main:app --reload
 ```
 
-The API will be available at `http://localhost:8000`
-
-API documentation: `http://localhost:8000/docs`
+The API runs on `http://localhost:8000`
+API docs: `http://localhost:8000/docs`
 
 ## API Endpoints
 
-### Register User
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/auth/register` | POST | Register with phone number |
+| `/api/v1/auth/request-otp` | POST | Request OTP for phone |
+| `/api/v1/auth/verify-otp` | POST | Verify OTP, returns JWT |
+| `/api/v1/auth/login` | POST | Login with phone + OTP |
+| `/api/v1/users/me` | GET | Get current user (protected) |
+| `/health` | GET | Health check |
+
+## Usage Example
+
+### 1. Register
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
+  -d '{"phone": "+1234567890", "name": "John"}'
 ```
 
-### Login
+### 2. Request OTP
 ```bash
-curl -X POST http://localhost:8000/api/v1/auth/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=user@example.com&password=password123"
+curl -X POST http://localhost:8000/api/v1/auth/request-otp \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "+1234567890"}'
 ```
 
-Response:
-```json
-{
-  "access_token": "eyJ...",
-  "token_type": "bearer"
-}
-```
-
-### Get Current User (Protected)
+### 3. Verify OTP (get JWT)
 ```bash
-curl -H "Authorization: Bearer <token>" http://localhost:8000/api/v1/auth/me
+curl -X POST http://localhost:8000/api/v1/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "+1234567890", "code": "123456"}'
 ```
 
-### Admin Only Route
+### 4. Login
 ```bash
-curl -H "Authorization: Bearer <token>" http://localhost:8000/api/v1/auth/admin/users
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "+1234567890", "code": "123456"}'
+```
+
+### 5. Get Current User
+```bash
+curl -X GET http://localhost:8000/api/v1/users/me \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ## Project Structure
 
 ```
 .
-├── main.py                 # FastAPI application entry point
-├── config.py               # Settings configuration
-├── app/
-│   ├── api/v1/auth.py      # Auth endpoints
-│   ├── auth/
-│   │   ├── password.py     # Argon2 password hashing
-│   │   ├── jwt.py          # JWT token utilities
-│   │   └── dependencies.py # Auth dependencies
-│   ├── db/database.py      # Database configuration
-│   ├── models/user.py      # User SQLAlchemy model
-│   └── schemas/user.py     # Pydantic schemas
-├── tests/
-│   └── test_auth.py        # Integration tests
-└── docker-compose.yml      # PostgreSQL setup
+├── main.py              # FastAPI app and routes
+├── otp_app/
+│   ├── config.py        # Settings
+│   ├── database.py     # Database config
+│   ├── models/         # SQLAlchemy models
+│   ├── schemas/        # Pydantic schemas
+│   └── services/        # Business logic
+├── data/                # SQLite database
+└── otp_venv/           # Virtual environment
 ```
 
-## Key Concepts
+## Notes
 
-### Password Hashing
-Uses Argon2 (via pwdlib) - recommended by FastAPI for security:
-```python
-from app.auth.password import hash_password, verify_password
-
-hashed = hash_password("mypassword")
-is_valid = verify_password("mypassword", hashed)
-```
-
-### JWT Tokens
-```python
-from app.auth.jwt import create_access_token, decode_token
-
-token = create_access_token(data={"sub": "user-id", "role": "user"})
-payload = decode_token(token)
-```
-
-### Protected Routes
-```python
-from app.auth.dependencies import get_current_user
-
-@app.get("/protected")
-async def protected_route(user: User = Depends(get_current_user)):
-    return {"user": user.email}
-```
-
-### Role-Based Access Control
-```python
-from app.auth.dependencies import require_role
-
-@app.get("/admin/users")
-async def admin_route(user: User = Depends(require_role("admin"))):
-    return {"data": "admin only"}
-```
-
-## Testing
-
-```bash
-pytest tests/test_auth.py -v
-```
-
-## Security Notes
-
-- Never hardcode secrets - use environment variables
-- Passwords are hashed with Argon2 (not stored as plain text)
-- JWT tokens expire after 30 minutes
-- Regular users cannot access admin routes
-- Error messages don't reveal if email exists (prevents enumeration)
+- OTP is mock (generated and stored, not sent via SMS)
+- OTP expires after 5 minutes
+- JWT token expires after 30 minutes
+- SQLite database at `./data/app.db`
