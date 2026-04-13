@@ -50,9 +50,12 @@ env/
 htmlcov/
 .tox/
 
-# Node (frontend if in same repo)
-# node_modules/
-# npm-debug.log*
+# Node / npm
+node_modules/
+npm-debug.log*
+frontend/node_modules/
+frontend/.next/
+frontend/out/
 
 # Logs
 *.log

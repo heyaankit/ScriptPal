@@ -1,6 +1,89 @@
 # ScriptPal - Autism Support Application
 
-Backend API for a communication and progress tracking tool for children with autism and their caregivers.
+A full-stack communication and progress tracking tool for children with autism and their caregivers.
+
+## Screenshots
+
+| Dashboard | Progress Tracking |
+|-----------|-------------------|
+| ![Dashboard](app_images/dashboard.png) | ![Progress](app_images/progress_bar.png) |
+
+[View all screenshots →](https://github.com/heyaankit/ScriptPal/tree/main/app_images)
+
+## Overview
+
+ScriptPal helps caregivers track their child's communication progress, manage therapy scripts, and monitor development milestones through an intuitive interface.
+
+## Tech Stack
+
+### Backend
+- **Framework**: FastAPI
+- **Database**: SQLite with SQLAlchemy
+- **Authentication**: JWT + OTP
+- **Validation**: Pydantic
+
+### Frontend
+- **Framework**: Next.js 15 with App Router
+- **UI**: React 19, Tailwind CSS 4, shadcn/ui
+- **Charts**: Recharts
+- **Icons**: Lucide React
+
+## How to Use This Repo
+
+### 1. Clone and Setup
+
+```bash
+git clone https://github.com/heyaankit/ScriptPal.git
+cd ScriptPal
+```
+
+### 2. Start Backend
+
+```bash
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run server
+uvicorn main:app --reload
+```
+
+Backend runs at: http://127.0.0.1:8000
+API Docs: http://127.0.0.1:8000/docs
+
+### 3. Start Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+Frontend runs at: http://localhost:3000
+
+### 4. Seed Demo Data (Optional)
+
+The app comes with 2 demo users pre-populated. To regenerate:
+
+```bash
+python -m app.seed_demo
+```
+
+### Demo Login
+
+| Phone | Name | Child | Country Code |
+|-------|------|-------|--------------|
+| 5550000001 | Sarah Johnson | Emma (5 years) | +1 |
+| 5550000002 | Michael Chen | Alex (4 years) | +1 |
+
+Use any phone number to register new users, or use the demo accounts above.
 
 ## Features
 
@@ -8,43 +91,12 @@ Backend API for a communication and progress tracking tool for children with aut
 - **Scripts Management**: Create, read, update, delete communication scripts
 - **Dashboard**: Personalized dashboard with daily suggestions and insights
 - **Progress Tracking**: Weekly, monthly, quarterly progress analytics
+- **Milestones**: Track and celebrate achievements
 - **Reports**: Generate and schedule progress reports
 - **Library**: Pre-defined communication resources
 - **Activities**: Interactive activities for children
 - **Notifications**: Activity and milestone notifications
 - **Profile Management**: User profile with child information
-
-## Tech Stack
-
-- **Framework**: FastAPI
-- **Database**: SQLite with SQLAlchemy
-- **Authentication**: JWT + OTP
-- **Validation**: Pydantic
-
-## Installation
-
-```bash
-# Create virtual environment
-python -m venv .venv
-
-# Activate
-source .venv/bin/activate  # Linux/Mac
-# or
-.venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-## Running the Server
-
-```bash
-# Start the server
-uvicorn main:app --reload
-
-# Server runs at http://127.0.0.1:8000
-# API Docs at http://127.0.0.1:8000/docs
-```
 
 ## API Endpoints
 
@@ -120,19 +172,6 @@ uvicorn main:app --reload
 | GET | `/api/v1/profile` | Get profile |
 | PATCH | `/api/v1/profile` | Update profile |
 
-## Seed Data
-
-To populate the database with initial data:
-
-```bash
-python -m app.seed
-```
-
-This creates:
-- 8 daily suggestions
-- 80+ library resources
-- 40+ activities
-
 ## Response Format
 
 All API responses follow this envelope format:
@@ -150,8 +189,7 @@ All API responses follow this envelope format:
 ```json
 {
   "success": false,
-  "error": "Error description",
-  "error_code": "ERROR_CODE"
+  "error": "Error description"
 }
 ```
 
@@ -178,10 +216,10 @@ Response includes:
 ## Environment Variables
 
 Create a `.env` file or the defaults in `app/config.py` will be used:
-- `DATABASE_URL`: SQLite database path
+- `DATABASE_URL`: SQLite database path (default: `sqlite:///./data/app.db`)
 - `SECRET_KEY`: JWT secret key
 - `ALGORITHM`: JWT algorithm (default: HS256)
-- `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiry
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiry (default: 30)
 - `OTP_LENGTH`: OTP digits (default: 6)
 - `OTP_EXPIRE_MINUTES`: OTP validity (default: 5)
 

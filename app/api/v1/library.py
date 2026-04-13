@@ -102,7 +102,7 @@ def list_library_resources(
 
     return success_response(
         data={
-            "resources": resources,
+            "items": resources,
             "pagination": result["pagination"],
             "filters": {
                 "available_categories": available_categories,

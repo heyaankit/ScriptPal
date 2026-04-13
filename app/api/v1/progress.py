@@ -36,73 +36,37 @@ def get_current_user_id(
 
 
 def get_period_dates(period: str) -> tuple[datetime, datetime]:
-    """Get start and end dates for a period."""
-    now = datetime.utcnow()
-    today = date.today()
+    """Get start and end dates for a period - using actual data range."""
+    now = datetime.now()
 
     if period == "week":
-        # Current week Monday to Sunday
-        days_since_monday = today.weekday()
-        start = datetime(today.year, today.month, today.day - days_since_monday)
-        end = start + timedelta(days=6, hours=23, minutes=59, seconds=59)
+        start = now - timedelta(days=7)
     elif period == "month":
-        # Current month
-        start = datetime(today.year, today.month, 1)
-        if today.month == 12:
-            end = datetime(today.year + 1, 1, 1) - timedelta(seconds=1)
-        else:
-            end = datetime(today.year, today.month + 1, 1) - timedelta(seconds=1)
+        start = now - timedelta(days=30)
     elif period == "quarter":
-        # Current quarter
-        quarter = (today.month - 1) // 3
-        q_start_month = quarter * 3 + 1
-        start = datetime(today.year, q_start_month, 1)
-        if q_start_month == 10:
-            end = datetime(today.year + 1, 1, 1) - timedelta(seconds=1)
-        else:
-            end = datetime(today.year, q_start_month + 3, 1) - timedelta(seconds=1)
+        start = now - timedelta(days=90)
     else:
-        raise HTTPException(status_code=400, detail="Invalid period")
+        start = now - timedelta(days=7)
 
-    return start, end
+    return start, now
 
 
 def get_previous_period_dates(period: str) -> tuple[datetime, datetime]:
     """Get start and end dates for the previous period."""
-    now = datetime.utcnow()
-    today = date.today()
+    now = datetime.now()
 
     if period == "week":
-        # Previous week
-        days_since_monday = today.weekday()
-        current_week_start = date(
-            today.year, today.month, today.day - days_since_monday
-        )
-        prev_week_start = current_week_start - timedelta(days=7)
-        start = datetime(
-            prev_week_start.year, prev_week_start.month, prev_week_start.day
-        )
-        end = start + timedelta(days=6, hours=23, minutes=59, seconds=59)
+        start = now - timedelta(days=14)
+        end = now - timedelta(days=7)
     elif period == "month":
-        # Previous month
-        if today.month == 1:
-            start = datetime(today.year - 1, 12, 1)
-        else:
-            start = datetime(today.year, today.month - 1, 1)
-        end = (start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+        start = now - timedelta(days=60)
+        end = now - timedelta(days=30)
     elif period == "quarter":
-        # Previous quarter
-        quarter = (today.month - 1) // 3
-        prev_quarter = quarter - 1 if quarter > 0 else 3
-        prev_year = today.year if quarter > 0 else today.year - 1
-        q_start_month = prev_quarter * 3 + 1
-        start = datetime(prev_year, q_start_month, 1)
-        if q_start_month == 10:
-            end = datetime(prev_year + 1, 1, 1) - timedelta(seconds=1)
-        else:
-            end = datetime(prev_year, q_start_month + 3, 1) - timedelta(seconds=1)
+        start = now - timedelta(days=180)
+        end = now - timedelta(days=90)
     else:
-        raise HTTPException(status_code=400, detail="Invalid period")
+        start = now - timedelta(days=14)
+        end = now - timedelta(days=7)
 
     return start, end
 
@@ -237,17 +201,17 @@ def get_weekly_progress(
     user_id: str = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-    """Get weekly progress with daily breakdown."""
-    today = date.today()
-    days_since_monday = today.weekday()
-    week_start = date(today.year, today.month, today.day - days_since_monday)
+    """Get weekly progress with daily breakdown for last 7 days."""
+    from datetime import datetime, timedelta
 
-    # Get scripts for each day of the week
+    today = datetime.now()
     labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     values = []
 
+    # Get last 7 days (today + 6 days back)
     for i in range(7):
-        day = week_start + timedelta(days=i)
+        days_ago = 6 - i
+        day = today - timedelta(days=days_ago)
         day_start = datetime(day.year, day.month, day.day)
         day_end = day_start + timedelta(days=1) - timedelta(seconds=1)
 
