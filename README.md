@@ -11,9 +11,9 @@ A full-stack communication and progress tracking tool for children with autism a
 
 ## Screenshots
 
-| Dashboard | Progress Tracking |
-|-----------|-------------------|
-| ![Dashboard](app_images/dashboard.png) | ![Progress](app_images/progress_bar.png) |
+![Dashboard](app_images/dashboard.png)
+
+![Progress](app_images/progress_bar.png)
 
 [View all screenshots →](https://github.com/heyaankit/ScriptPal/tree/main/app_images)
 
