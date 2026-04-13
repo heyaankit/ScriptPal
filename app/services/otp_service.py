@@ -2,8 +2,8 @@ import secrets
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from otp_app.models import OTP, User
-from otp_app.config import settings
+from app.models import OTP, User
+from app.config import settings
 
 
 def generate_otp() -> str:

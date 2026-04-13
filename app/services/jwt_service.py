@@ -1,7 +1,7 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
-from otp_app.config import settings
+from app.config import settings
 
 
 def create_access_token(data: dict) -> str:
