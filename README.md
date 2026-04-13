@@ -1,5 +1,12 @@
 # ScriptPal - Autism Support Application
 
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![GitHub Stars](https://img.shields.io/github/stars/heyaankit/ScriptPal.svg)](https://github.com/heyaankit/ScriptPal/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/heyaankit/ScriptPal.svg)](https://github.com/heyaankit/ScriptPal/issues)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-cyan.svg)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+
 A full-stack communication and progress tracking tool for children with autism and their caregivers.
 
 ## Screenshots
